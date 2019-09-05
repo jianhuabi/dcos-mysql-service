@@ -1,0 +1,137 @@
+
+{
+  "type": "object",
+  "properties": {
+    "service": {
+      "type": "object",
+      "description": "DC/OS service configuration properties",
+      "properties": {
+        "name": {
+          "description": "The name of the service instance",
+          "type": "string",
+          "default": "mysql-master-slave",
+          "title": "Service name"
+        },
+        "password": {
+          "description": "password of mysql root .",
+          "type": "string",
+          "default": "123456",
+          "title": "password"
+        },
+        "user": {
+          "description": "The user that the service will run as.",
+          "type": "string",
+          "default": "root",
+          "title": "User"
+        },
+        "service_account": {
+          "description": "The service account for DC/OS service authentication. This is typically left empty to use the default unless service authentication is needed. The value given here is passed as the principal of Mesos framework.",
+          "type": "string",
+          "default": ""
+        },
+        "service_account_secret": {
+          "description": "Name of the Secret Store credentials to use for DC/OS service authentication. This should be left empty unless service authentication is needed.",
+          "type": "string",
+          "default": "",
+          "title": "Credential secret name (optional)"
+        },
+        "virtual_network_enabled": {
+          "description": "Enable virtual networking",
+          "type": "boolean",
+          "default": true 
+        },
+        "virtual_network_name": {
+          "description": "The name of the virtual network to join",
+          "type": "string",
+          "default": "dcos"
+        },
+        "virtual_network_plugin_labels": {
+          "description": "Labels to pass to the virtual network plugin. Comma-separated key:value pairs. For example: k_0:v_0,k_1:v_1,...,k_n:v_n",
+          "type": "string",
+          "default": ""
+        },
+        "log_level": {
+          "description": "The log level for the DC/OS service.",
+          "type": "string",
+          "enum": [
+            "OFF",
+            "FATAL",
+            "ERROR",
+            "WARN",
+            "INFO",
+            "DEBUG",
+            "TRACE",
+            "ALL"
+          ],
+          "default": "INFO"
+        },
+        "sleep": {
+          "description": "The sleep duration in seconds before tasks exit.",
+          "type": "number",
+          "default": 1000
+        }
+      },
+      "required": [
+        "name",
+        "sleep",
+        "user"
+      ]
+    },
+    "node": {
+      "description": "mysql slave pod configuration properties",
+      "type": "object",
+      "properties": {
+        "count": {
+          "title": "mysql slave Node count",
+          "description": "slave Number of mysql pods to run",
+          "type": "integer",
+          "default": 1
+        },
+        "placement_constraint": {
+          "title": "Placement constraint",
+          "description": "Placement constraints for nodes. Example: [[\"hostname\", \"UNIQUE\"]]",
+          "type": "string",
+          "default": "[[\"hostname\", \"UNIQUE\"]]",
+          "media": {
+            "type": "application/x-zone-constraints+json"
+          }
+        },
+        "cpus": {
+          "title": "CPU count",
+          "description": "mysql pod CPU requirements",
+          "type": "number",
+          "default": 1
+        },
+        "mem": {
+          "title": "Memory size (MB)",
+          "description": "mysql pod mem requirements (in MB)",
+          "type": "integer",
+          "default": 1024 
+        },
+        "disk": {
+          "title": "Disk size (MB)",
+          "description": "mysql pod persistent disk requirements (in MB)",
+          "type": "integer",
+          "default": 1024 
+        },
+        "disk_type": {
+          "title": "Disk type [ROOT, MOUNT]",
+          "description": "Mount volumes require preconfiguration in DC/OS",
+          "enum": [
+            "ROOT",
+            "MOUNT"
+          ],
+          "default": "ROOT"
+        }
+      },
+      "required": [
+        "count",
+        "cpus",
+        "mem",
+        "disk",
+        "disk_type"
+      ]
+    }
+  }
+}
+
