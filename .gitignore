@@ -1,14 +1,44 @@
-# Compiled source #
-###################
+.gopath
+.gradle_cache
+*-universe-url
 
-# Logs and databases #
-######################
+md-to-toc.py*
+__pycache__/
+package
 
-# OS generated files #
-######################
+# maven
+target/
+
+# idea
+*.i??
+.idea/
+out/
+
+# eclipse
+.classpath
+.project
+.settings/
+kafka-*/bin/
+
+# gradle
+.gradle
+build/
+
+# log
+*.log
+dcos-kafka-service.log.*
+
+# vim swap files
+*.swp
+
+# OS X
 .DS_Store
-.DS_Store?
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+
+# test
+integration/.cache/
+.cache/
+integration/env/
+
+# tools
+tools/shakedown_env
+*.pyc
