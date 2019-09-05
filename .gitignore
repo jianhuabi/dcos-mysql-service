@@ -18,7 +18,7 @@ out/
 .classpath
 .project
 .settings/
-kafka-*/bin/
+mysql-*/bin/
 
 # gradle
 .gradle
@@ -26,7 +26,7 @@ build/
 
 # log
 *.log
-dcos-kafka-service.log.*
+dcos-mysql-service.log.*
 
 # vim swap files
 *.swp
