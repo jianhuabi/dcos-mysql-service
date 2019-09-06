@@ -1,11 +1,11 @@
-
-name: {{FRAMEWORK_NAME}}
+me: {{FRAMEWORK_NAME}}
 scheduler:
   principal: {{FRAMEWORK_PRINCIPAL}}
   user: {{FRAMEWORK_USER}}
 pods:
-  mysql:
-    count: {{NODE_COUNT}}
+  mysqlmaster:
+    count: 1
+    image: {{MYSQL_SER_IMAGE}}
     placement: '{{{NODE_PLACEMENT}}}'
     {{#ENABLE_VIRTUAL_NETWORK}}
     networks:
@@ -15,12 +15,95 @@ pods:
     tasks:
       node:
         goal: RUNNING
-        cmd: "echo mysql >> mysql-container-path/output && sleep $SLEEP_DURATION"
+        cmd: |
+              echo "[mysqld]" >/etc/mysql/my.cnf 
+              echo "log-bin=mysql-bin" >>/etc/mysql/my.cnf 
+              echo "server-id=1" >>/etc/mysql/my.cnf 
+              chown -R mysql:mysql /mnt && chmod -R 777 /tmp && chmod -R 777 /mnt && export MYSQL_ROOT_PASSWORD={{MYSQL_ROOT_PASSWORD}} && /entrypoint.sh mysqld 
         cpus: {{NODE_CPUS}}
         memory: {{NODE_MEM}}
-        volume:
-          path: "mysql-container-path"
-          type: {{NODE_DISK_TYPE}}
-          size: {{NODE_DISK}}
         env:
-          SLEEP_DURATION: {{SLEEP_DURATION}}
+          MYSQL_ROOT_PASSWORD: {{MYSQL_ROOT_PASSWORD}}
+  mysqlslave:
+    count: {{NODE_COUNT}} 
+    image: {{MYSQL_SER_IMAGE}}
+    placement: '{{{NODE_PLACEMENT}}}'
+    {{#ENABLE_VIRTUAL_NETWORK}}
+    networks:
+      {{VIRTUAL_NETWORK_NAME}}:
+        labels: {{VIRTUAL_NETWORK_PLUGIN_LABELS}}
+    {{/ENABLE_VIRTUAL_NETWORK}}
+    tasks:
+      node:
+        goal: RUNNING
+        cmd: |
+              echo "[mysqld]" >/etc/mysql/my.cnf 
+              echo "server-id=`head -10 /dev/urandom | cksum | cut -f2 -d" "`" >>/etc/mysql/my.cnf 
+              chown -R mysql:mysql /mnt && chmod -R 777 /tmp && chmod -R 777 /mnt && export MYSQL_ROOT_PASSWORD={{MYSQL_ROOT_PASSWORD}} && /entrypoint.sh mysqld 
+        cpus: {{NODE_CPUS}}
+        memory: {{NODE_MEM}}
+        env:
+          MYSQL_ROOT_PASSWORD: {{MYSQL_ROOT_PASSWORD}}
+  mysqlcli:
+    count: 1
+    image: {{MYSQL_CLI_IMAGE}}
+    placement: '{{{NODE_PLACEMENT}}}'
+    {{#ENABLE_VIRTUAL_NETWORK}}
+    networks:
+      {{VIRTUAL_NETWORK_NAME}}:
+        labels: {{VIRTUAL_NETWORK_PLUGIN_LABELS}}
+    {{/ENABLE_VIRTUAL_NETWORK}}
+    tasks:
+      node:
+        goal: ONCE 
+        cmd: |
+              echo "get ip"
+              MASTERIP=`dig +short mysqlmaster-0-node.{{FRAMEWORK_NAME}}.containerip.dcos.thisdcos.directory`
+              SLAVEIP=`dig +short mysqlslave-0-node.{{FRAMEWORK_NAME}}.containerip.dcos.thisdcos.directory`
+              echo "masterip:${MASTERIP}"
+              echo "slaveip:${SLAVEIP}"
+              echo "Waiting for mysqld to be ready (accepting connections)"
+              until mysql -h ${MASTERIP} -uroot -p'{{MYSQL_ROOT_PASSWORD}}' -e "SELECT 1"; do sleep 1; done
+              num=$(expr {{NODE_COUNT}} - 1)
+              for i in `seq 0  ${num}`
+              do 
+              until mysql -h mysqlslave-${i}-node.{{FRAMEWORK_NAME}}.containerip.dcos.thisdcos.directory -uroot -p'{{MYSQL_ROOT_PASSWORD}}' -e "SELECT 1"; do sleep 1; done
+              done 
+              echo "create replication user"
+              mysql -h ${MASTERIP} -uroot -p'{{MYSQL_ROOT_PASSWORD}}' -e  "GRANT REPLICATION SLAVE ON *.* to 'replica'@'%' identified by '123456';FLUSH PRIVILEGES;"
+              mysql -h ${MASTERIP} -uroot -p'{{MYSQL_ROOT_PASSWORD}}' -e  "show master status\G;"
+              echo "Initializing replication from master position"
+              # binlog postion.
+              logfilename=`mysql -h ${MASTERIP} -uroot -p'{{MYSQL_ROOT_PASSWORD}}' -e  "show master status"|grep mysql-bin|awk '{print $1}'`
+              logfilepos=`mysql -h ${MASTERIP} -uroot -p'{{MYSQL_ROOT_PASSWORD}}' -e  "show master status"|grep mysql-bin|awk '{print $2}'`
+              #create slave
+              for j in `seq 0  ${num}`
+              do
+              mysql -h mysqlslave-${j}-node.{{FRAMEWORK_NAME}}.containerip.dcos.thisdcos.directory -uroot -p'{{MYSQL_ROOT_PASSWORD}}' <<EOF
+              change master to master_host='${MASTERIP}',
+              master_user='replica',master_log_file='${logfilename}',
+              master_log_pos=${logfilepos},
+              master_port=3306,
+              master_password='123456';
+              start slave;
+              show slave status\G; 
+              EOF
+              done
+        cpus: {{NODE_CPUS}}
+        memory: {{NODE_MEM}}
+        env:
+          MYSQL_ROOT_PASSWORD: {{MYSQL_ROOT_PASSWORD}}
+plans:
+  deploy:
+    strategy: serial
+    phases:
+      server-deploy:
+        strategy: serial
+        pod: mysqlmaster
+      deploy:
+        strategy: serial
+        pod: mysqlslave
+      cli-deploy:
+        strategy: serial
+        pod: mysqlcli
+

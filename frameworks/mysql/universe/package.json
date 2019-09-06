@@ -3,14 +3,14 @@
   "packagingVersion": "4.0",
   "upgradesFrom": ["{{upgrades-from}}"],
   "downgradesTo": ["{{downgrades-to}}"],
-  "minDcosReleaseVersion": "1.9",
+  "minDcosReleaseVersion": "1.12",
   "name": "mysql",
-  "version": "0.2.5-5.7.25",
-  "maintainer": "support@YOURNAMEHERE.COM",
-  "description": "YOURNAMEHERE on DC/OS",
+  "version": "0.2.11-5.7.25",
+  "maintainer": "mbi@d2iq.com",
+  "description": "Mysql Community on DC/OS",
   "selected": false,
   "framework": true,
-  "tags": ["0.42.1", "mysql"],
-  "postInstallNotes": "DC/OS YOURNAMEHERE is being installed!\n\n\tDocumentation: {{documentation-path}}\n\tIssues: {{issues-path}}",
-  "postUninstallNotes": "DC/OS YOURNAMEHERE is being uninstalled."
+  "tags": ["0.56.2", "mysql"],
+  "postInstallNotes": "DC/OS mysql is being installed!\n\n\tDocumentation: {{documentation-path}}\n\tIssues: {{issues-path}}",
+  "postUninstallNotes": "DC/OS mysql is being uninstalled."
 }
