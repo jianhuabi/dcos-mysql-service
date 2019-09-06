@@ -5,7 +5,7 @@
       "jre-tar-gz": "{{jre-url}}",
       "libmesos-bundle-tar-gz": "{{libmesos-bundle-url}}",
       "bootstrap-zip": "https://downloads.mesosphere.com/dcos-commons/artifacts/{{dcos-sdk-version}}/bootstrap.zip",
-      "scheduler-zip": "{{artifact-dir}}/mysql-scheduler.zip"
+      "scheduler-zip": "{{artifact-dir}}/operator-scheduler.zip"
     },
      "container": {
       "docker": {

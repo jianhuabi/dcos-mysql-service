@@ -5,7 +5,7 @@
   "downgradesTo": ["{{downgrades-to}}"],
   "minDcosReleaseVersion": "1.12",
   "name": "mysql",
-  "version": "0.2.11-5.7.25",
+  "version": "0.2.15-5.7.25",
   "maintainer": "mbi@d2iq.com",
   "description": "Mysql Community on DC/OS",
   "selected": false,

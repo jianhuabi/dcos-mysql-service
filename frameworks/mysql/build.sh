@@ -15,7 +15,7 @@ $FRAMEWORK_DIR/cli/build.sh
 $REPO_ROOT_DIR/tools/build_package.sh \
     mysql \
     $FRAMEWORK_DIR \
-    -a "$FRAMEWORK_DIR/build/distributions/$(basename $FRAMEWORK_DIR)-scheduler.zip" \
+    -a "$FRAMEWORK_DIR/build/distributions/operator-scheduler.zip" \
     -a "$FRAMEWORK_DIR/cli/dcos-service-cli-linux" \
     -a "$FRAMEWORK_DIR/cli/dcos-service-cli-darwin" \
     -a "$FRAMEWORK_DIR/cli/dcos-service-cli.exe" \

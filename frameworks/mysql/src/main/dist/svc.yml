@@ -1,4 +1,4 @@
-me: {{FRAMEWORK_NAME}}
+name: {{FRAMEWORK_NAME}}
 scheduler:
   principal: {{FRAMEWORK_PRINCIPAL}}
   user: {{FRAMEWORK_USER}}

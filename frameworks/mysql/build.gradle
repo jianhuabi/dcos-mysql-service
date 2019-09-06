@@ -31,10 +31,10 @@ dependencies {
 
 distributions {
     main {
-        baseName = 'scheduler-scheduler'
-        applicationName = 'scheduler'
+        baseName = 'operator-scheduler'
+        applicationName = 'mysql'
         version = ''
     }
 }
 
-mainClassName = 'com.mesosphere.sdk.operator.scheduler'
+mainClassName = 'com.mesosphere.sdk.operator.scheduler.Main'
