@@ -31,8 +31,8 @@ dependencies {
 
 distributions {
     main {
-        baseName = 'mysql-scheduler'
-        applicationName = 'mysql'
+        baseName = 'scheduler-scheduler'
+        applicationName = 'scheduler'
         version = ''
     }
 }
